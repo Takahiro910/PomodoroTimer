@@ -2,6 +2,7 @@ from functools import partial
 import math
 from tkinter import *
 from plyer import notification
+from PIL import Image, ImageTk
 
 
 # ---------------------------- CONSTANTS ------------------------------- #
@@ -25,7 +26,7 @@ def reset_timer():
     check_labal.config(text="")
     global reps
     reps = 1
-
+    start_button.configure(text="Start", command=partial(start_timer, 0))
 
 # ---------------------------- TIMER MECHANISM ------------------------------- # 
 def start_timer(count):
@@ -60,7 +61,7 @@ def count_down(count):
             notification.notify(title="休憩だよ", message="休憩を取りましょう。", app_name="Pomodoro Timer", app_icon="timer.ico")
         else:
             notification.notify(title="作業開始", message="作業を始めましょう。", app_name="Pomodoro Timer", app_icon="timer.ico")
-        start_timer()
+        start_timer(0)
 
 
 # ---------------------------- PAUSE MECHANISM ------------------------------- #
@@ -76,21 +77,22 @@ def pause_timer():
 window = Tk()
 window.title("Pomodoro")
 window.config(padx=100, pady=50, bg=YELLOW)
-window.iconbitmap("timer.ico")
+window.iconbitmap("image/timer.ico")
 
 mode_label = Label(text="Timer", font=(FONT_NAME, 35, "bold"), bg=YELLOW, foreground=GREEN)
-mode_label.grid(column=1, row=0)
+mode_label.grid(column=1, row=0, pady=10)
 
 canvas = Canvas(width=200, height=224, bg=YELLOW, highlightthickness=0)
-tomato_image = PhotoImage(file="tomato.png")
+tomato_image = PhotoImage(file="image/tomato.png")
 canvas.create_image(100, 112, image=tomato_image)
 timer_text = canvas.create_text(100, 135, text="00:00", fill="white", font=(FONT_NAME, 35, "bold"))
 canvas.grid(column=1, row=1)
 
-start_button = Button(text="Start", width=10, font=("Arial", 10, "normal"), borderwidth=0, bg=PINK, command=partial(start_timer,0))
+button_img = ImageTk.PhotoImage(Image.open("image/button.png").resize((75,75)))
+start_button = Button(text="Start", font=("Arial", 15, "normal"), fg="white", image=button_img,  bg=YELLOW, activeforeground="white", activebackground=YELLOW, borderwidth=0, command=partial(start_timer,0), compound="center")
 start_button.grid(column=0, row=2)
 
-reset_button = Button(text="Reset", width=10, font=("Arial", 10, "normal"), borderwidth=0, bg=PINK, command=reset_timer)
+reset_button = Button(image=button_img, text="Reset", font=("Arial", 15, "normal"), fg="white", borderwidth=0, bg=YELLOW, activeforeground="white", activebackground=YELLOW, command=reset_timer, compound="center")
 reset_button.grid(column=2, row=2)
 
 check_labal = Label(foreground=GREEN, font=(FONT_NAME, 20, "normal", ), bg=YELLOW, wraplength=120)
