@@ -1,3 +1,4 @@
+from functools import partial
 import math
 from tkinter import *
 from plyer import notification
@@ -9,8 +10,8 @@ RED = "#e7305b"
 GREEN = "#9bdeac"
 YELLOW = "#f7f5dd"
 FONT_NAME = "Courier"
-WORK_MIN = 1
-SHORT_BREAK_MIN = 1
+WORK_MIN = 25
+SHORT_BREAK_MIN = 5
 LONG_BREAK_MIN = 20
 reps = 1
 timer = None
@@ -27,17 +28,21 @@ def reset_timer():
 
 
 # ---------------------------- TIMER MECHANISM ------------------------------- # 
-def start_timer():
+def start_timer(count):
+    start_button.configure(text="Pause", command=pause_timer)
     global reps
-    if reps % 8 == 0:
-        count_down(LONG_BREAK_MIN * 60)
-        mode_label.config(text="LONG BREAK", fg=RED)
-    elif reps % 2 == 0:
-        count_down(SHORT_BREAK_MIN * 60)
-        mode_label.config(text="BREAK", fg=PINK)
+    if count == 0:
+        if reps % 8 == 0:
+            count_down(LONG_BREAK_MIN * 60)
+            mode_label.config(text="LONG BREAK", fg=RED)
+        elif reps % 2 == 0:
+            count_down(SHORT_BREAK_MIN * 60)
+            mode_label.config(text="BREAK", fg=PINK)
+        else:
+            count_down(WORK_MIN * 60)
+            mode_label.config(text="WORK", fg=GREEN)
     else:
-        count_down(WORK_MIN * 60)
-        mode_label.config(text="WORK", fg=GREEN)
+        count_down(count)
     reps += 1
 
 
@@ -58,10 +63,20 @@ def count_down(count):
         start_timer()
 
 
+# ---------------------------- PAUSE MECHANISM ------------------------------- #
+def pause_timer():
+    global timer
+    window.after_cancel(timer)
+    count = canvas.itemcget(2, "text").split(":")
+    count_sec = int(count[0]) * 60 + int(count[1])
+    start_button.configure(text="Start", command=partial(start_timer, count_sec))
+
+
 # ---------------------------- UI SETUP ------------------------------- #
 window = Tk()
 window.title("Pomodoro")
 window.config(padx=100, pady=50, bg=YELLOW)
+window.iconbitmap("timer.ico")
 
 mode_label = Label(text="Timer", font=(FONT_NAME, 35, "bold"), bg=YELLOW, foreground=GREEN)
 mode_label.grid(column=1, row=0)
@@ -72,7 +87,7 @@ canvas.create_image(100, 112, image=tomato_image)
 timer_text = canvas.create_text(100, 135, text="00:00", fill="white", font=(FONT_NAME, 35, "bold"))
 canvas.grid(column=1, row=1)
 
-start_button = Button(text="Start", width=10, font=("Arial", 10, "normal"), borderwidth=0, bg=PINK, command=start_timer)
+start_button = Button(text="Start", width=10, font=("Arial", 10, "normal"), borderwidth=0, bg=PINK, command=partial(start_timer,0))
 start_button.grid(column=0, row=2)
 
 reset_button = Button(text="Reset", width=10, font=("Arial", 10, "normal"), borderwidth=0, bg=PINK, command=reset_timer)
