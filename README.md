@@ -6,4 +6,4 @@ with windows notification.
 2. Edit property of "timer.lnk". Make "link" as "cmd /c default-link".
 3. Pin the shortcut file to startmenu!
 
-![img.png](img.png)
+![timer_image](image/timer_image.png)
